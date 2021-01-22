@@ -1,5 +1,6 @@
 # ===
 # instructions:
+# run powershell as admin
 # powershell.exe -ExecutionPolicy Bypass -File <filename>
 # ===
 
@@ -11,9 +12,9 @@ Import-Module ActiveDirectory
 # ---
 # declarations
 # ---
-$DaysInactive = 0
+$DaysInactive = 365
 $InactiveDate = (Get-Date).Adddays(-($DaysInactive))
-$KeepAccounts = @('MSSQL', 'default', 'dhcpdns', 'test1', 'tv', 'sccmadmin', '_default', 'sbchristensen', 'mccaulcd', 'brummett', 'bigdaddy', 'Bitterjr', 'Khadley', 'Robbie', 'henderst', 'thesteve', 'hepleraj')
+$KeepAccounts = @('MSSQL', 'default', 'dhcpdns', 'test1', 'tv', 'sccmadmin', '_default', 'sbchristensen', 'mccaulcd', 'brummett', 'bigdaddy', 'Bitterjr', 'Khadley', 'Robbie', 'henderst', 'thesteve', 'hepleraj', 'sweetejr', 'Meyern' )
 
 # ---
 # get users that have been inactive for $DaysInactive
@@ -21,11 +22,11 @@ $KeepAccounts = @('MSSQL', 'default', 'dhcpdns', 'test1', 'tv', 'sccmadmin', '_d
 # next line targets all accounts excluding those in the $KeepAccounts array
 # $Users = Get-ADUser -Filter { LastLogonDate -lt $InactiveDate -and Enabled -eq $true -and SamAccountName -notlike "*svc*" } -Properties LastLogonDate | Where-Object SamAccountName -notin $KeepAccounts | Select-Object @{ Name="Username"; Expression={$_.SamAccountName} }, Name, LastLogonDate, DistinguishedName
 
-# next line targets all accounts in OU=DEAD excluding those in the $KeepAccounts array
-# $Users = Get-ADUser -SearchBase "OU=DEAD,DC=INFOTECH,DC=LOCAL" -Filter { LastLogonDate -lt $InactiveDate -and Enabled -eq $true -and SamAccountName -notlike "*svc*" } -Properties LastLogonDate | Where-Object SamAccountName -notin $KeepAccounts | Select-Object @{ Name="Username"; Expression={$_.SamAccountName} }, Name, LastLogonDate, DistinguishedName
+# next line targets all accounts in OU=Student Accounts excluding those in the $KeepAccounts array
+$Users = Get-ADUser -SearchBase "OU=Student Accounts,DC=INFOTECH,DC=LOCAL" -Filter { LastLogonDate -lt $InactiveDate -and Enabled -eq $true -and SamAccountName -notlike "*svc*" } -Properties LastLogonDate | Where-Object SamAccountName -notin $KeepAccounts | Select-Object @{ Name="Username"; Expression={$_.SamAccountName} }, Name, LastLogonDate, DistinguishedName
 
-# next line targets all accounts in OU=DEAD that have never logged in excluding those in the $KeepAccounts array
-$Users = Get-ADUser -SearchBase "OU=DEAD,DC=INFOTECH,DC=LOCAL"  -Filter { LastLogonDate -notlike "*" -and Enabled -eq $true } -Properties LastLogonDate | Where-Object SamAccountName -notin $KeepAccounts  | Select-Object @{ Name="Username"; Expression={$_.SamAccountName} }, Name, LastLogonDate, DistinguishedName
+# next line targets all accounts in OU=Student Accounts that have never logged in excluding those in the $KeepAccounts array
+# $Users = Get-ADUser -SearchBase "OU=Student Accounts,DC=INFOTECH,DC=LOCAL"  -Filter { LastLogonDate -notlike "*" -and Enabled -eq $true } -Properties LastLogonDate | Where-Object SamAccountName -notin $KeepAccounts | Select-Object @{ Name="Username"; Expression={$_.SamAccountName} }, Name, LastLogonDate, DistinguishedName
 
 # ---
 # report
